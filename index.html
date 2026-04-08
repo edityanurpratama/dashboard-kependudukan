@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Kependudukan Kelurahan</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;transition:background .4s}
+.dark-mode{background:#0d0d1a}
+.light-mode{background:#f0f4fb}
+
+@keyframes heroBgDark{0%,100%{background:linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b)}16%{background:linear-gradient(135deg,#064e3b,#065f46,#022c22)}33%{background:linear-gradient(135deg,#3b0764,#581c87,#2e1065)}50%{background:linear-gradient(135deg,#431407,#7c2d12,#431407)}66%{background:linear-gradient(135deg,#0c4a6e,#075985,#0c4a6e)}83%{background:linear-gradient(135deg,#14532d,#166534,#052e16)}}
+@keyframes heroBgLight{0%,100%{background:linear-gradient(135deg,#1a3a6b,#2563eb,#1e40af)}16%{background:linear-gradient(135deg,#065f46,#059669,#047857)}33%{background:linear-gradient(135deg,#6b21a8,#7c3aed,#5b21b6)}50%{background:linear-gradient(135deg,#92400e,#d97706,#b45309)}66%{background:linear-gradient(135deg,#0c4a6e,#0284c7,#0369a1)}83%{background:linear-gradient(135deg,#14532d,#16a34a,#15803d)}}
+@keyframes borderFlow{0%,100%{border-color:#4f8ef7;box-shadow:0 0 10px rgba(79,142,247,.25)}16%{border-color:#34d399;box-shadow:0 0 10px rgba(52,211,153,.25)}33%{border-color:#a78bfa;box-shadow:0 0 10px rgba(167,139,250,.25)}50%{border-color:#f472b6;box-shadow:0 0 10px rgba(244,114,182,.25)}66%{border-color:#fbbf24;box-shadow:0 0 10px rgba(251,191,36,.25)}83%{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.25)}}
+@keyframes textGlow{0%,100%{color:#93c5fd}16%{color:#6ee7b7}33%{color:#c4b5fd}50%{color:#f9a8d4}66%{color:#fde68a}83%{color:#7dd3fc}}
+@keyframes textGlowLight{0%,100%{color:#1d4ed8}16%{color:#065f46}33%{color:#6d28d9}50%{color:#be185d}66%{color:#92400e}83%{color:#0369a1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}45%{opacity:.15;transform:scale(.6)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(600%)}}
+@keyframes ripple{0%{transform:translate(-50%,-50%) scale(.6);opacity:.9}100%{transform:translate(-50%,-50%) scale(2.4);opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+
+.app{padding:14px;max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:11px}
+.hero{border-radius:18px;padding:22px 26px;display:grid;grid-template-columns:1fr 175px;align-items:center;gap:12px;overflow:hidden;position:relative;min-height:158px;border:1.5px solid rgba(255,255,255,.2)}
+.dark-mode .hero{animation:heroBgDark 10s ease-in-out infinite}
+.light-mode .hero{animation:heroBgLight 10s ease-in-out infinite}
+.hero-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:scan 2.5s linear infinite;pointer-events:none}
+.hero-title{font-size:21px;font-weight:700;line-height:1.2;margin-bottom:4px;color:#fff}
+.hero-sub{color:rgba(255,255,255,.55);font-size:11px;margin-bottom:13px}
+.ldot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;margin-right:5px;vertical-align:middle;animation:blink .9s ease-in-out infinite}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.p{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:10px;padding:4px 11px;border-radius:999px;cursor:pointer;border:1px solid rgba(255,255,255,.2);transition:all .2s;user-select:none}
+.p:hover,.p.on{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.5);transform:scale(1.04)}
+.theme-toggle{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;cursor:pointer;border:1.5px solid transparent;font-size:11px;font-weight:600;transition:all .3s;user-select:none;animation:borderFlow 10s ease-in-out infinite;position:relative;z-index:10;align-self:flex-start}
+.dark-mode .theme-toggle{background:#1e1e3f;color:#e2e8f0}
+.light-mode .theme-toggle{background:#fff;color:#1e293b;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.toggle-icon{font-size:14px;transition:transform .4s}
+
+.krow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kcard{border-radius:13px;padding:13px 15px;border:1.5px solid transparent;animation:fadeUp .5s ease both,borderFlow 10s ease-in-out infinite;transition:background .4s}
+.dark-mode .kcard{background:#12122a}
+.light-mode .kcard{background:#fff}
+.kcard:nth-child(2){animation-delay:.1s,1.5s}.kcard:nth-child(3){animation-delay:.15s,3s}.kcard:nth-child(4){animation-delay:.2s,4.5s}
+.kico{width:33px;height:33px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;animation:borderFlow 10s ease-in-out infinite;border:1.5px solid transparent;transition:background .4s}
+.dark-mode .kico svg{color:white}
+.light-mode .kico svg{color:#3b4fd4}
+.dark-mode .kico{background:#1e1e3f}
+.light-mode .kico{background:#eff6ff}
+.knum{font-size:20px;font-weight:700;line-height:1}
+.dark-mode .knum{animation:textGlow 10s ease-in-out infinite}
+.light-mode .knum{animation:textGlowLight 10s ease-in-out infinite}
+.klbl{font-size:10px;margin-top:3px;transition:color .4s}
+.dark-mode .klbl{color:#6b7280}
+.light-mode .klbl{color:#94a3b8}
+.ktag{font-size:9px;padding:2px 7px;border-radius:999px;margin-top:5px;display:inline-block;font-weight:500;animation:borderFlow 10s ease-in-out infinite;border:1px solid transparent;transition:color .3s}
+.dark-mode .ktag{color:rgba(255,255,255,.7)}
+.light-mode .ktag{color:#374151}
+
+.row2{display:grid;grid-template-columns:3fr 2fr;gap:11px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.card{border-radius:13px;padding:15px;border:1.5px solid transparent;animation:borderFlow 10s ease-in-out infinite;transition:background .4s}
+.dark-mode .card{background:#12122a}
+.light-mode .card{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card:nth-child(2){animation-delay:2s}.card:nth-child(3){animation-delay:4s}
+.ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:11px;transition:color .4s}
+.dark-mode .ch{color:#2d2d4e}
+.light-mode .ch{color:#94a3b8}
+
+.tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.tb{font-size:10px;padding:4px 11px;border-radius:999px;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.dark-mode .tb{border-color:#2d2d4e;background:transparent;color:#3d3d5c}
+.light-mode .tb{border-color:#e2e8f0;background:transparent;color:#94a3b8}
+.tb.on{color:#fff!important;background:#4f8ef7;border-color:#4f8ef7;animation:borderFlow 10s ease-in-out infinite}
+
+.donut-section{display:flex;align-items:center;gap:14px}
+.donut-wrap{width:126px;height:126px;flex-shrink:0;position:relative}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.donut-center-num{font-size:13px;font-weight:700}
+.dark-mode .donut-center-num{animation:textGlow 10s ease-in-out infinite}
+.light-mode .donut-center-num{animation:textGlowLight 10s ease-in-out infinite}
+.donut-center-lbl{font-size:9px;transition:color .4s}
+.dark-mode .donut-center-lbl{color:#6b7280}
+.light-mode .donut-center-lbl{color:#94a3b8}
+.donut-stats{display:flex;flex-direction:column;gap:7px;flex:1}
+.dsr{display:flex;align-items:center;gap:6px;font-size:11px}
+.dsdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+.dnum{font-size:11px;font-weight:600}
+.dark-mode .dnum{animation:textGlow 10s ease-in-out infinite}
+.light-mode .dnum{animation:textGlowLight 10s ease-in-out infinite}
+.dlbl{font-size:9px;transition:color .4s}
+.dark-mode .dlbl{color:#6b7280}
+.light-mode .dlbl{color:#94a3b8}
+
+.gbars{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+.gbrow{display:flex;align-items:center;gap:6px;font-size:10px}
+.gblbl{width:14px;flex-shrink:0;text-align:right;font-size:10px;transition:color .4s}
+.dark-mode .gblbl{color:#6b7280}
+.light-mode .gblbl{color:#94a3b8}
+.gbtrack{flex:1;border-radius:4px;height:12px;overflow:hidden;transition:background .4s}
+.dark-mode .gbtrack{background:#1e1e3f}
+.light-mode .gbtrack{background:#f1f5f9}
+.gbfill{height:100%;border-radius:4px;transition:width .6s;animation:borderFlow 10s ease-in-out infinite}
+.gbval{width:36px;text-align:right;font-size:10px;font-weight:600;flex-shrink:0}
+.dark-mode .gbval{animation:textGlow 10s ease-in-out infinite}
+.light-mode .gbval{animation:textGlowLight 10s ease-in-out infinite}
+
+/* RT Grid */
+.rt-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.rtc{border-radius:7px;padding:8px 2px;text-align:center;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid transparent;position:relative;overflow:hidden;transition:transform .15s;color:#fff}
+.rtc:hover{transform:scale(1.12)}
+.rtc.sel{border:2px solid white;box-shadow:0 0 14px rgba(255,255,255,.35)}
+.rtc.blink{animation:pulse 1.1s ease-in-out infinite}
+.rring{position:absolute;top:50%;left:50%;width:90%;height:90%;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);animation:ripple 1.6s ease-out infinite;pointer-events:none}
+.rtdetail{margin-top:9px;font-size:11px;min-height:44px;padding:10px 12px;border-radius:8px;border:1.5px solid transparent;animation:borderFlow 10s ease-in-out infinite;transition:background .4s,color .4s;line-height:1.6}
+.dark-mode .rtdetail{background:#0d0d1a;color:#6b7280}
+.light-mode .rtdetail{background:#f8fafc;color:#94a3b8}
+
+/* Cluster pills */
+.cpill{border-radius:11px;padding:11px 13px;margin-bottom:7px;border:1.5px solid rgba(255,255,255,.2);position:relative;overflow:hidden;animation:borderFlow 10s ease-in-out infinite}
+.cpill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);animation:scan 2.2s linear infinite}
+.cptitle{font-size:11px;font-weight:700;color:#fff}
+.cpsub{font-size:9px;color:rgba(255,255,255,.5);margin-top:1px}
+.cpnum{font-size:16px;font-weight:700;color:#fff;margin-top:4px}
+.cpbg{height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:7px;overflow:hidden}
+.cpfill{height:100%;border-radius:2px;animation:pulse 2.2s ease-in-out infinite}
+
+/* Alerts */
+.alrt{display:flex;gap:7px;align-items:flex-start;padding:8px 9px;border-radius:9px;font-size:10px;line-height:1.5;margin-bottom:6px;border:1px solid transparent;animation:borderFlow 10s ease-in-out infinite}
+.dark-mode .ar{background:#1f0a0a;color:#fca5a5}
+.dark-mode .ay{background:#1c1404;color:#fcd34d}
+.dark-mode .ag{background:#061a0e;color:#6ee7b7}
+.dark-mode .ab{background:#0a0f1f;color:#93c5fd}
+.light-mode .ar{background:#fef2f2;color:#b91c1c}
+.light-mode .ay{background:#fffbeb;color:#92400e}
+.light-mode .ag{background:#f0fdf4;color:#166534}
+.light-mode .ab{background:#eff6ff;color:#1e40af}
+.aico{font-size:12px;flex-shrink:0;animation:blink 1.4s ease-in-out infinite}
+
+.tchi{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:8px;font-size:10px;animation:slideL .3s ease both,borderFlow 10s ease-in-out infinite;border:1px solid transparent}
+
+/* Proyeksi */
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.proj-cell{border-radius:8px;padding:8px 10px;border:1px solid transparent;animation:borderFlow 10s ease-in-out infinite;text-align:center}
+.dark-mode .proj-cell{background:#1a1a35}
+.light-mode .proj-cell{background:#f8fafc}
+.proj-yr{font-size:9px;font-weight:600;margin-bottom:3px;transition:color .4s}
+.dark-mode .proj-yr{color:#3d3d5c}
+.light-mode .proj-yr{color:#94a3b8}
+.proj-val{font-size:13px;font-weight:700}
+.dark-mode .proj-val{animation:textGlow 10s ease-in-out infinite}
+.light-mode .proj-val{animation:textGlowLight 10s ease-in-out infinite}
+
+.ticker{font-size:10px;text-align:center;padding:7px;letter-spacing:.03em}
+.dark-mode .ticker{animation:textGlow 10s ease-in-out infinite}
+.light-mode .ticker{animation:textGlowLight 10s ease-in-out infinite}
+.leg-dot{width:8px;height:8px;border-radius:2px}
+.leg-txt{font-size:10px;transition:color .4s}
+.dark-mode .leg-txt{color:#6b7280}
+.light-mode .leg-txt{color:#94a3b8}
+.cw{position:relative;height:175px}
+.cw2{position:relative;height:145px}
+.header-bar{display:flex;justify-content:space-between;align-items:center;padding:4px 0 8px}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;padding:2px 7px;border-radius:999px;font-weight:600;vertical-align:middle}
+.info-box{border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:10px;line-height:1.6;border:1px solid transparent;animation:borderFlow 10s ease-in-out infinite}
+.dark-mode .info-box{background:#12122a;color:#6b7280}
+.light-mode .info-box{background:#f8fafc;color:#64748b}
+</style>
+</head>
+<body>
+<div class="app dark-mode" id="app">
+
+<!-- HEADER -->
+<div class="header-bar">
+  <div style="font-size:11px;transition:color .4s" id="modeLabel" class="leg-txt">Mode: Gelap</div>
+  <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+    <span class="toggle-icon" id="toggleIcon">☀</span>
+    <span id="toggleLabel">Mode Terang</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero" id="heroEl">
+  <div class="hero-scan"></div>
+  <div style="position:relative;z-index:2">
+    <div class="hero-title"><span class="ldot"></span>Dashboard Kependudukan Kelurahan</div>
+    <div class="hero-sub">35 RT · Data 2021–2025 · Analisis K-Means 7 Kelompok · Proyeksi 2026–2028</div>
+    <div class="pills" id="filterRow">
+      <span class="p on" data-f="all">Semua Tahun</span>
+      <span class="p" data-f="2021">2021</span>
+      <span class="p" data-f="2022">2022</span>
+      <span class="p" data-f="2023">2023</span>
+      <span class="p" data-f="2024">2024</span>
+      <span class="p" data-f="2025">2025</span>
+    </div>
+  </div>
+  <svg viewBox="0 0 200 160" width="162" style="flex-shrink:0;animation:float 3.5s ease-in-out infinite;position:relative;z-index:2">
+    <rect x="30" y="55" width="90" height="95" rx="7" fill="white" opacity=".12"/>
+    <rect x="50" y="38" width="50" height="25" rx="4" fill="white" opacity=".1"/>
+    <rect x="18" y="72" width="12" height="78" rx="3" fill="#8ab4d8" opacity=".2"/>
+    <rect x="120" y="72" width="12" height="78" rx="3" fill="#8ab4d8" opacity=".2"/>
+    <rect x="36" y="66" width="16" height="18" rx="2" fill="#7db8e8" opacity=".35"/>
+    <rect x="60" y="66" width="16" height="18" rx="2" fill="#7db8e8" opacity=".35"/>
+    <rect x="84" y="66" width="16" height="18" rx="2" fill="#7db8e8" opacity=".35"/>
+    <rect x="36" y="92" width="16" height="18" rx="2" fill="#7db8e8" opacity=".35"/>
+    <rect x="60" y="92" width="16" height="18" rx="2" fill="#7db8e8" opacity=".35"/>
+    <rect x="84" y="92" width="16" height="18" rx="2" fill="#7db8e8" opacity=".35"/>
+    <rect x="55" y="118" width="40" height="32" rx="4" fill="#378add" opacity=".4"/>
+    <path d="M60 42 L75 30 L90 42" fill="none" stroke="white" stroke-width="1.5" opacity=".4"/>
+    <circle cx="75" cy="27" r="4" fill="#fde68a" opacity=".85"/>
+    <circle cx="155" cy="58" r="11" fill="#fde68a" opacity=".8"/>
+    <rect x="144" y="70" width="22" height="26" rx="7" fill="white" opacity=".18"/>
+    <rect x="148" y="84" width="6" height="14" rx="3" fill="#c7d9ef" opacity=".4"/>
+    <rect x="158" y="84" width="6" height="14" rx="3" fill="#c7d9ef" opacity=".4"/>
+    <circle cx="130" cy="86" r="9" fill="#fbb6ce" opacity=".7"/>
+    <rect x="121" y="96" width="18" height="20" rx="6" fill="white" opacity=".18"/>
+    <circle cx="40" cy="22" r="3" fill="#fbbf24"><animate attributeName="opacity" values="1;.1;1" dur="1.1s" repeatCount="indefinite"/></circle>
+    <circle cx="180" cy="40" r="2.5" fill="#34d399"><animate attributeName="opacity" values="1;.1;1" dur=".8s" repeatCount="indefinite"/></circle>
+    <circle cx="10" cy="110" r="3" fill="#f87171"><animate attributeName="opacity" values="1;.1;1" dur="1.4s" repeatCount="indefinite"/></circle>
+    <circle cx="190" cy="125" r="2" fill="#a78bfa"><animate attributeName="opacity" values="1;.1;1" dur="1s" repeatCount="indefinite"/></circle>
+    <circle cx="20" cy="50" r="1.5" fill="#38bdf8"><animate attributeName="opacity" values="1;.1;1" dur=".7s" repeatCount="indefinite"/></circle>
+  </svg>
+</div>
+
+<!-- KPI CARDS -->
+<div class="krow">
+  <div class="kcard">
+    <div class="kico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="knum" id="kTotal">76.128</div>
+    <div class="klbl">Total jiwa tercatat</div>
+    <span class="ktag">5 tahun · 35 RT</span>
+  </div>
+  <div class="kcard" style="animation-delay:.1s,1.5s">
+    <div class="kico" style="animation-delay:1.5s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="knum" id="kMale" style="animation-delay:1.5s">38.887</div>
+    <div class="klbl">Laki-laki</div>
+    <span class="ktag" id="kMaleTag">51,1%</span>
+  </div>
+  <div class="kcard" style="animation-delay:.15s,3s">
+    <div class="kico" style="animation-delay:3s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="knum" id="kFemale" style="animation-delay:3s">37.241</div>
+    <div class="klbl">Perempuan</div>
+    <span class="ktag" id="kFemaleTag">48,9%</span>
+  </div>
+  <div class="kcard" style="animation-delay:.2s,4.5s">
+    <div class="kico" style="animation-delay:4.5s"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polyline points="22,7 13.5,15.5 8.5,10.5 2,17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="16,7 22,7 22,13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="knum" id="kRatio">1,04</div>
+    <div class="klbl">Rasio L : P</div>
+    <span class="ktag">Hampir seimbang</span>
+  </div>
+</div>
+
+<!-- TREN + GENDER -->
+<div class="row2">
+  <div class="card">
+    <div class="ch">Tren penduduk per tahun</div>
+    <div class="tabs">
+      <span class="tb on" data-t="total">Total</span>
+      <span class="tb" data-t="gender">L vs P</span>
+      <span class="tb" data-t="cluster">Per Kelompok</span>
+      <span class="tb" data-t="proj">Proyeksi 2026–28</span>
+    </div>
+    <div class="cw"><canvas id="trendChart"></canvas></div>
+  </div>
+  <div class="card" style="animation-delay:2s">
+    <div class="ch">Komposisi gender</div>
+    <div class="donut-section">
+      <div class="donut-wrap">
+        <canvas id="donutChart" width="126" height="126"></canvas>
+        <div class="donut-center">
+          <div class="donut-center-num" id="donutCN">51,1%</div>
+          <div class="donut-center-lbl">Laki-laki</div>
+        </div>
+      </div>
+      <div class="donut-stats">
+        <div class="dsr"><div class="dsdot" style="background:#4f8ef7"></div><div><div class="dnum" id="dMale">38.887</div><div class="dlbl">Laki-laki</div></div></div>
+        <div class="dsr"><div class="dsdot" style="background:#f472b6;animation-delay:.5s"></div><div><div class="dnum" id="dFemale">37.241</div><div class="dlbl">Perempuan</div></div></div>
+      </div>
+    </div>
+    <div class="gbars">
+      <div class="gbrow"><div class="gblbl">L</div><div class="gbtrack"><div class="gbfill" id="bMale" style="width:51.1%"></div></div><div class="gbval" id="bMalePct">51,1%</div></div>
+      <div class="gbrow"><div class="gblbl">P</div><div class="gbtrack"><div class="gbfill" id="bFemale" style="width:48.9%;animation-delay:2s"></div></div><div class="gbval" id="bFemalePct">48,9%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PETA RT -->
+<div class="card" style="animation-delay:1s">
+  <div class="ch">Peta sebaran RT — klik RT untuk melihat detail · berkedip = populasi 5 terbesar</div>
+  <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#6366f1"></div><span class="leg-txt">Fluktuasi Stabil</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#ef4444"></div><span class="leg-txt">Penurunan Kuat</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#10b981"></div><span class="leg-txt">Tumbuh Stabil</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#3b82f6"></div><span class="leg-txt">Pertumbuhan Sedang</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#f59e0b"></div><span class="leg-txt">Populasi Kecil Naik</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#8b5cf6"></div><span class="leg-txt">Populasi Besar</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><div class="leg-dot" style="background:#f43f5e"></div><span class="leg-txt">Penurunan Kritis</span></div>
+    <div style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse .8s infinite"></span><span class="leg-txt">Top 5</span></div>
+  </div>
+  <div class="rt-grid" id="rtGrid"></div>
+  <div class="rtdetail" id="rtDetail">👆 Klik salah satu kotak RT untuk melihat detail jumlah penduduk, tren, dan kelompok analisisnya</div>
+</div>
+
+<!-- TOP 10 + CLUSTER PROFILE -->
+<div class="row2">
+  <div class="card">
+    <div class="ch">Top 10 RT — total penduduk terbanyak (2021–2025)</div>
+    <div style="position:relative;height:252px"><canvas id="barChart"></canvas></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="card" style="animation-delay:1.5s">
+      <div class="ch">7 Kelompok hasil analisis K-Means</div>
+      <div id="clusterPills"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROYEKSI + PERINGATAN -->
+<div class="row2">
+  <div class="card">
+    <div class="ch">Proyeksi penduduk 2026–2028 per kelompok</div>
+    <div style="position:relative;height:220px"><canvas id="projChart"></canvas></div>
+    <div class="info-box" style="margin-top:10px">
+      ⓘ Proyeksi menggunakan regresi linear tren. Kelompok <strong>Penurunan Kuat</strong> dan <strong>Penurunan Kritis</strong> memerlukan perhatian khusus karena tren negatif yang signifikan.
+    </div>
+  </div>
+  <div class="card" style="animation-delay:1.5s">
+    <div class="ch">Peringatan & rekomendasi</div>
+    <div class="alrt ar"><span class="aico">!</span><span><strong>Penurunan Kritis (RT 13 & 21):</strong> Tren turun tajam −137 jiwa/tahun. Perlu kajian penyebab dan intervensi segera seperti program sosial atau perbaikan fasilitas.</span></div>
+    <div class="alrt ar" style="animation-delay:.3s"><span class="aico" style="animation-delay:.3s">!</span><span><strong>Penurunan Kuat (RT 8,19,26,27,31):</strong> 5 RT dengan penurunan rata-rata −166 jiwa/tahun. Pantau mobilitas penduduk keluar wilayah.</span></div>
+    <div class="alrt ay" style="animation-delay:.6s"><span class="aico" style="animation-delay:.4s">~</span><span><strong>Populasi Besar (RT 1,5,14):</strong> Rata-rata 672 jiwa/RT/tahun dengan pertumbuhan +81/tahun. Infrastruktur perlu disiapkan untuk menampung pertumbuhan.</span></div>
+    <div class="alrt ag" style="animation-delay:.9s"><span class="aico" style="animation-delay:.6s">✓</span><span><strong>Tumbuh Stabil (7 RT):</strong> Pertumbuhan terkendali dan stabil — kelompok terbesar dengan kondisi paling ideal.</span></div>
+    <div class="alrt ab" style="animation-delay:1.2s"><span class="aico" style="animation-delay:.8s">i</span><span><strong>Silhouette Score 0,295 · DB Index 0,865</strong> — validasi statistik menunjukkan pengelompokan cukup bermakna untuk data 35 RT.</span></div>
+  </div>
+</div>
+
+<!-- CHART BAWAH -->
+<div class="row3">
+  <div class="card" style="animation-delay:.5s">
+    <div class="ch">Gender per RT (sampel)</div>
+    <div class="cw2"><canvas id="gRTChart"></canvas></div>
+  </div>
+  <div class="card" style="animation-delay:1.5s">
+    <div class="ch">Distribusi total populasi RT</div>
+    <div class="cw2"><canvas id="distChart"></canvas></div>
+  </div>
+  <div class="card" style="animation-delay:2.5s">
+    <div class="ch">5 RT perubahan terbesar (2021→2025)</div>
+    <div id="topList" style="display:flex;flex-direction:column;gap:5px;margin-top:4px"></div>
+  </div>
+</div>
+
+<div class="ticker" id="ticker">memuat data...</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ===================== DATA =====================
+const RAW=[
+  {rt:1, cl:5, male:[42,739,32,667,174],   female:[189,305,196,89,846]},
+  {rt:2, cl:3, male:[110,87,479,101,750],  female:[102,37,283,95,502]},
+  {rt:3, cl:4, male:[137,80,143,6,302],    female:[72,29,35,286,330]},
+  {rt:4, cl:4, male:[114,122,65,162,64],   female:[54,170,64,167,129]},
+  {rt:5, cl:5, male:[217,162,228,212,388], female:[378,270,579,872,384]},
+  {rt:6, cl:3, male:[54,27,466,67,58],     female:[65,400,170,882,103]},
+  {rt:7, cl:0, male:[6,164,25,181,294],    female:[499,157,19,17,337]},
+  {rt:8, cl:1, male:[818,2,75,22,524],     female:[382,795,10,319,170]},
+  {rt:9, cl:3, male:[434,126,95,16,642],   female:[279,161,790,22,305]},
+  {rt:10,cl:3, male:[36,75,202,126,166],   female:[190,51,821,197,140]},
+  {rt:11,cl:4, male:[50,503,447,15,37],    female:[158,28,11,342,149]},
+  {rt:12,cl:0, male:[45,273,3,284,154],    female:[20,310,134,20,454]},
+  {rt:13,cl:6, male:[299,538,176,25,8],    female:[120,389,75,294,11]},
+  {rt:14,cl:5, male:[147,445,522,955,170], female:[252,275,47,250,50]},
+  {rt:15,cl:2, male:[42,59,355,272,406],   female:[384,104,47,26,351]},
+  {rt:16,cl:2, male:[83,367,324,176,9],    female:[166,266,51,447,365]},
+  {rt:17,cl:0, male:[16,93,5,383,77],      female:[112,189,34,286,19]},
+  {rt:18,cl:4, male:[229,57,60,244,423],   female:[97,123,23,140,5]},
+  {rt:19,cl:1, male:[721,154,577,4,107],   female:[259,573,414,18,140]},
+  {rt:20,cl:4, male:[181,11,201,79,527],   female:[93,218,144,18,117]},
+  {rt:21,cl:6, male:[222,73,83,5,209],     female:[681,66,125,96,50]},
+  {rt:22,cl:2, male:[89,88,326,430,352],   female:[180,117,273,306,60]},
+  {rt:23,cl:0, male:[58,372,79,583,57],    female:[213,104,137,229,20]},
+  {rt:24,cl:2, male:[320,211,56,579,226],  female:[317,34,321,13,191]},
+  {rt:25,cl:4, male:[11,29,139,203,134],   female:[66,111,295,120,206]},
+  {rt:26,cl:1, male:[489,803,205,45,202],  female:[529,73,251,164,174]},
+  {rt:27,cl:1, male:[851,384,34,337,31],   female:[71,46,131,352,278]},
+  {rt:28,cl:4, male:[15,8,58,21,209],      female:[181,47,307,112,219]},
+  {rt:29,cl:3, male:[227,175,418,484,107], female:[4,171,68,601,68]},
+  {rt:30,cl:0, male:[49,101,781,101,153],  female:[223,43,134,246,63]},
+  {rt:31,cl:1, male:[175,511,123,333,110], female:[722,402,434,17,201]},
+  {rt:32,cl:3, male:[83,157,563,346,94],   female:[45,259,640,32,70]},
+  {rt:33,cl:2, male:[731,65,17,67,14],     female:[37,516,120,321,741]},
+  {rt:34,cl:2, male:[373,47,161,40,174],   female:[222,479,238,15,217]},
+  {rt:35,cl:2, male:[224,646,281,236,472], female:[3,73,14,94,80]}
+];
+
+const KL_INFO=[
+  {id:0,nama:"Fluktuasi Stabil",   warna:"#6366f1", rt:[7,12,17,23,30], slope:26,   rata:334, bg:"linear-gradient(135deg,#312e81,#4338ca)"},
+  {id:1,nama:"Penurunan Kuat",     warna:"#ef4444", rt:[8,19,26,27,31], slope:-166, rata:582, bg:"linear-gradient(135deg,#7f1d1d,#b91c1c)"},
+  {id:2,nama:"Tumbuh Stabil",      warna:"#10b981", rt:[15,16,22,24,33,34,35], slope:13, rata:443, bg:"linear-gradient(135deg,#064e3b,#059669)"},
+  {id:3,nama:"Pertumbuhan Sedang", warna:"#3b82f6", rt:[2,6,9,10,29,32], slope:67, rata:477, bg:"linear-gradient(135deg,#1e3a8a,#2563eb)"},
+  {id:4,nama:"Populasi Kecil Naik",warna:"#f59e0b", rt:[3,4,11,18,20,25,28], slope:45, rata:279, bg:"linear-gradient(135deg,#78350f,#d97706)"},
+  {id:5,nama:"Populasi Besar",     warna:"#8b5cf6", rt:[1,5,14], slope:81, rata:672, bg:"linear-gradient(135deg,#4c1d95,#7c3aed)"},
+  {id:6,nama:"Penurunan Kritis",   warna:"#f43f5e", rt:[13,21], slope:-137, rata:354, bg:"linear-gradient(135deg,#881337,#e11d48)"},
+];
+
+// Proyeksi per klaster 2026-2028
+const PROJ={
+  0:[2061,2190,2320],
+  1:[425,0,0],
+  2:[3379,3471,3563],
+  3:[4063,4463,4862],
+  4:[2900,3216,3533],
+  5:[2743,2986,3228],
+  6:[0,0,0]
+};
+
+const YRS=[2021,2022,2023,2024,2025];
+const sm=a=>a.reduce((s,v)=>s+v,0);
+let isDark=true,pIdx=0,trendMode='total';
+let tChart,donutC,barC,gRTc,distC,projC;
+
+const PALETTES=[
+  {l1:'#4f8ef7',l2:'#818cf8',m:'#4f8ef7',f:'#f472b6',bg1:'rgba(79,142,247,.15)',bg2:'rgba(244,114,182,.15)',b1:'rgba(79,142,247,.78)',b2:'rgba(129,140,248,.78)',dn:['#4f8ef7','#f472b6']},
+  {l1:'#34d399',l2:'#6ee7b7',m:'#34d399',f:'#a78bfa',bg1:'rgba(52,211,153,.15)',bg2:'rgba(167,139,250,.15)',b1:'rgba(52,211,153,.78)',b2:'rgba(110,231,183,.78)',dn:['#34d399','#a78bfa']},
+  {l1:'#a78bfa',l2:'#c4b5fd',m:'#a78bfa',f:'#f9a8d4',bg1:'rgba(167,139,250,.15)',bg2:'rgba(249,168,212,.15)',b1:'rgba(167,139,250,.78)',b2:'rgba(196,181,253,.78)',dn:['#a78bfa','#f9a8d4']},
+  {l1:'#fbbf24',l2:'#fde68a',m:'#fbbf24',f:'#f87171',bg1:'rgba(251,191,36,.15)',bg2:'rgba(248,113,113,.15)',b1:'rgba(251,191,36,.78)',b2:'rgba(253,230,138,.78)',dn:['#fbbf24','#f87171']},
+  {l1:'#38bdf8',l2:'#7dd3fc',m:'#38bdf8',f:'#fb7185',bg1:'rgba(56,189,248,.15)',bg2:'rgba(251,113,133,.15)',b1:'rgba(56,189,248,.78)',b2:'rgba(125,211,252,.78)',dn:['#38bdf8','#fb7185']},
+];
+
+function pal(){return PALETTES[pIdx%PALETTES.length]}
+function gridC(){return isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.07)'}
+function tickC(){return isDark?'#4b5563':'#94a3b8'}
+function legC(){return isDark?'#4b5563':'#94a3b8'}
+
+function toggleTheme(){
+  const app=document.getElementById('app');
+  isDark=!isDark;
+  app.classList.toggle('dark-mode',isDark);
+  app.classList.toggle('light-mode',!isDark);
+  document.getElementById('toggleIcon').textContent=isDark?'☀':'☾';
+  document.getElementById('toggleLabel').textContent=isDark?'Mode Terang':'Mode Gelap';
+  document.getElementById('modeLabel').textContent='Mode: '+(isDark?'Gelap':'Terang');
+  rebuildAll();
+}
+
+function buildTrend(mode){
+  const ctx=document.getElementById('trendChart');
+  if(tChart) tChart.destroy();
+  const p=pal(),gc=gridC(),tc=tickC();
+  let ds=[],labels=YRS.map(String);
+  if(mode==='total'){
+    ds=[{label:'Total',data:YRS.map((_,i)=>sm(RAW.map(d=>d.male[i]+d.female[i]))),borderColor:p.l1,backgroundColor:p.bg1,fill:true,tension:.4,pointRadius:5,pointBackgroundColor:p.l1,borderWidth:2.5}];
+  } else if(mode==='gender'){
+    ds=[
+      {label:'Laki-laki',data:YRS.map((_,i)=>sm(RAW.map(d=>d.male[i]))),borderColor:p.m,backgroundColor:p.bg1,fill:true,tension:.4,pointRadius:5,pointBackgroundColor:p.m,borderWidth:2.5},
+      {label:'Perempuan',data:YRS.map((_,i)=>sm(RAW.map(d=>d.female[i]))),borderColor:p.f,backgroundColor:p.bg2,fill:true,tension:.4,pointRadius:5,pointBackgroundColor:p.f,borderWidth:2.5}
+    ];
+  } else if(mode==='cluster'){
+    const clColors=[p.l1,p.l2,'#10b981','#f59e0b','#f472b6','#8b5cf6','#f43f5e'];
+    ds=KL_INFO.map((k,i)=>({
+      label:k.nama,
+      data:YRS.map((_,yi)=>sm(RAW.filter(d=>d.cl===k.id).map(d=>d.male[yi]+d.female[yi]))),
+      borderColor:k.warna,backgroundColor:k.warna+'22',fill:false,tension:.4,pointRadius:4,pointBackgroundColor:k.warna,borderWidth:2
+    }));
+  } else if(mode==='proj'){
+    // Total aktual + proyeksi gabungan
+    const aktual=YRS.map((_,i)=>sm(RAW.map(d=>d.male[i]+d.female[i])));
+    labels=[...YRS.map(String),'2026','2027','2028'];
+    // Proyeksi total dari semua klaster kecuali yg negatif
+    const proj26=PROJ[0][0]+PROJ[2][0]+PROJ[3][0]+PROJ[4][0]+PROJ[5][0];
+    const proj27=PROJ[0][1]+PROJ[2][1]+PROJ[3][1]+PROJ[4][1]+PROJ[5][1];
+    const proj28=PROJ[0][2]+PROJ[2][2]+PROJ[3][2]+PROJ[4][2]+PROJ[5][2];
+    ds=[
+      {label:'Data Aktual',data:[...aktual,null,null,null],borderColor:p.l1,backgroundColor:p.bg1,fill:true,tension:.4,pointRadius:5,pointBackgroundColor:p.l1,borderWidth:2.5},
+      {label:'Proyeksi (Kelompok Naik)',data:[null,null,null,null,aktual[4],proj26,proj27,proj28],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',fill:false,tension:.4,pointRadius:5,pointBackgroundColor:'#f59e0b',borderWidth:2,borderDash:[5,4]}
+    ];
+  }
+  tChart=new Chart(ctx,{type:'line',data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:mode!=='total',labels:{font:{size:9},boxWidth:8,color:legC()}}},scales:{x:{grid:{color:gc},ticks:{font:{size:9},color:tc}},y:{grid:{color:gc},ticks:{font:{size:9},color:tc,callback:v=>v.toLocaleString('id')}}},interaction:{mode:'index',intersect:false}}});
+}
+
+function buildDonut(M,F){
+  const p=pal(),ctx=document.getElementById('donutChart');
+  if(donutC) donutC.destroy();
+  donutC=new Chart(ctx,{type:'doughnut',data:{labels:['Laki-laki','Perempuan'],datasets:[{data:[M,F],backgroundColor:p.dn,borderWidth:0,hoverOffset:4}]},options:{responsive:false,cutout:'72%',plugins:{legend:{display:false}},animation:{animateRotate:true,duration:500}}});
+}
+
+function buildBar(){
+  const p=pal(),gc=gridC(),tc=tickC();
+  const tops=[...RAW].map(d=>({rt:d.rt,cl:d.cl,tot:sm(d.male)+sm(d.female)})).sort((a,b)=>b.tot-a.tot).slice(0,10);
+  if(barC) barC.destroy();
+  barC=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:tops.map(d=>'RT '+d.rt),datasets:[{data:tops.map(d=>d.tot),backgroundColor:tops.map(d=>KL_INFO[d.cl].warna+'bb'),borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.raw.toLocaleString('id')+' jiwa'}}},scales:{x:{grid:{color:gc},ticks:{font:{size:9},color:tc,callback:v=>v.toLocaleString('id')}},y:{grid:{display:false},ticks:{font:{size:9},color:tc}}}}});
+}
+
+function buildProjChart(){
+  const p=pal(),gc=gridC(),tc=tickC();
+  if(projC) projC.destroy();
+  // Tampilkan 4 kelompok terbesar proyeksinya
+  const shown=[2,3,4,5];
+  const labels=['2026','2027','2028'];
+  const ds=shown.map(id=>{
+    const k=KL_INFO[id];
+    return{label:k.nama,data:PROJ[id],backgroundColor:k.warna+'99',borderColor:k.warna,borderWidth:1.5,borderRadius:4};
+  });
+  projC=new Chart(document.getElementById('projChart'),{type:'bar',data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:9},boxWidth:8,color:legC()}}},scales:{x:{grid:{color:gc},ticks:{font:{size:9},color:tc}},y:{grid:{color:gc},ticks:{font:{size:9},color:tc,callback:v=>v.toLocaleString('id')}}}}});
+}
+
+function buildGRT(){
+  const p=pal(),gc=gridC(),tc=tickC();
+  const smp=RAW.filter((_,i)=>i%3===0).slice(0,12);
+  if(gRTc) gRTc.destroy();
+  gRTc=new Chart(document.getElementById('gRTChart'),{type:'bar',data:{labels:smp.map(d=>'RT'+d.rt),datasets:[{label:'L',data:smp.map(d=>sm(d.male)),backgroundColor:p.m+'bb',borderRadius:3},{label:'P',data:smp.map(d=>sm(d.female)),backgroundColor:p.f+'bb',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:8},boxWidth:7,color:legC()}}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:8},color:tc}},y:{stacked:true,grid:{color:gc},ticks:{font:{size:8},color:tc,callback:v=>v.toLocaleString('id')}}}}});
+}
+
+function buildDist(){
+  const p=pal(),gc=gridC(),tc=tickC();
+  const tots=RAW.map(d=>sm(d.male)+sm(d.female));
+  const bins=[0,500,1000,1500,2000,3000];
+  const counts=[...bins.slice(0,-1).map((_,i)=>tots.filter(t=>t>=bins[i]&&t<bins[i+1]).length),tots.filter(t=>t>=3000).length];
+  if(distC) distC.destroy();
+  distC=new Chart(document.getElementById('distChart'),{type:'bar',data:{labels:['<500','500-1k','1k-1,5k','1,5k-2k','2k-3k','≥3k'],datasets:[{data:counts,backgroundColor:p.b1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+' RT'}}},scales:{x:{grid:{display:false},ticks:{font:{size:8},color:tc}},y:{grid:{color:gc},ticks:{font:{size:8},color:tc,stepSize:2,callback:v=>v+' RT'}}}}});
+}
+
+function buildTopChange(){
+  const ch=RAW.map(d=>{const t0=d.male[0]+d.female[0],t4=d.male[4]+d.female[4];return{rt:d.rt,cl:d.cl,delta:t4-t0,pct:Math.round((t4-t0)/Math.max(t0,1)*100)};}).sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)).slice(0,5);
+  const el=document.getElementById('topList');el.innerHTML='';
+  ch.forEach((c,i)=>{
+    const up=c.delta>0;
+    const k=KL_INFO[c.cl];
+    const d=document.createElement('div');
+    d.className='tchi';
+    d.style.cssText=`background:${up?(isDark?'rgba(52,211,153,.08)':'rgba(220,252,231,.7)'):(isDark?'rgba(248,113,113,.08)':'rgba(254,226,226,.7)')};animation-delay:${i*.07}s,0s`;
+    d.innerHTML=`<span style="font-size:10px;font-weight:700;color:${k.warna};width:34px">RT ${c.rt}</span><span style="flex:1;font-size:9px;color:${isDark?'#4b5563':'#94a3b8'}">${k.nama}</span><span style="font-size:10px;font-weight:700;color:${up?'#34d399':'#f87171'}">${up?'+':''}${c.delta.toLocaleString('id')} (${up?'+':''}${c.pct}%)</span>`;
+    el.appendChild(d);
+  });
+}
+
+function buildRTGrid(){
+  const grid=document.getElementById('rtGrid');grid.innerHTML='';
+  const tots=RAW.map(d=>sm(d.male)+sm(d.female));
+  const mx=Math.max(...tots),mn=Math.min(...tots);
+  const topSet=new Set([...tots].map((t,i)=>({t,i})).sort((a,b)=>b.t-a.t).slice(0,5).map(x=>RAW[x.i].rt));
+  RAW.forEach((d,idx)=>{
+    const t=tots[idx],norm=(t-mn)/(mx-mn);
+    const k=KL_INFO[d.cl];
+    // Parse warna hex ke rgb
+    const hex=k.warna.replace('#','');
+    const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+    const alpha=isDark?(0.25+norm*.65):(0.3+norm*.6);
+    const cell=document.createElement('div');
+    cell.className='rtc'+(topSet.has(d.rt)?' blink':'');
+    cell.style.background=`rgba(${r},${g},${b},${alpha})`;
+    cell.textContent=d.rt;
+    if(topSet.has(d.rt)){const rr=document.createElement('div');rr.className='rring';cell.appendChild(rr);}
+    cell.onclick=()=>{
+      document.querySelectorAll('.rtc').forEach(c=>c.classList.remove('sel'));
+      cell.classList.add('sel');
+      const M=sm(d.male),F=sm(d.female),T=M+F;
+      const tvec=d.male.map((m,i)=>m+d.female[i]);
+      const peak=Math.max(...tvec),peakYr=YRS[tvec.indexOf(peak)];
+      const tr=tvec[4]-tvec[0];
+      const trendTxt=tr>0?`<span style="color:#34d399">+${tr.toLocaleString('id')} (naik)</span>`:`<span style="color:#f87171">${tr.toLocaleString('id')} (turun)</span>`;
+      document.getElementById('rtDetail').innerHTML=
+        `<strong style="color:${k.warna}">RT ${d.rt}</strong> · <span style="background:${k.warna}22;color:${k.warna};padding:1px 6px;border-radius:4px;font-size:9px">${k.nama}</span> · Total 5 tahun: <strong>${T.toLocaleString('id')} jiwa</strong> · L: <strong>${M.toLocaleString('id')}</strong> · P: <strong>${F.toLocaleString('id')}</strong><br>Tahun tertinggi: <strong>${peak} jiwa</strong> (${peakYr}) · Perubahan 2021→2025: ${trendTxt}`;
+    };
+    grid.appendChild(cell);
+  });
+}
+
+function buildClusterPills(){
+  const el=document.getElementById('clusterPills');el.innerHTML='';
+  KL_INFO.forEach(k=>{
+    const trendIcon=k.slope>0?'↑':'↓';
+    const trendClr=k.slope>0?'#34d399':'#f87171';
+    const div=document.createElement('div');
+    div.className='cpill';
+    div.style.background=k.bg;
+    div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="cptitle">${k.nama}</div><div class="cpsub">${k.rt.length} RT: ${k.rt.map(r=>'RT '+r).join(', ')}</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:700;color:#fff">${k.rata}</div><div style="font-size:9px;color:rgba(255,255,255,.5)">rata²/tahun</div></div></div><div class="cpbg"><div class="cpfill" style="width:${Math.min(100,k.rata/8)}%;background:rgba(255,255,255,.6)"></div></div><div style="margin-top:5px;font-size:9px;color:rgba(255,255,255,.6)">Tren: <span style="color:${trendClr};font-weight:700">${trendIcon} ${k.slope>0?'+':''}${k.slope} jiwa/tahun</span></div>`;
+    el.appendChild(div);
+  });
+}
+
+function buildKPI(f){
+  let M=0,F=0;
+  RAW.forEach(d=>{
+    const yi=(['all'].includes(f)||f.startsWith('c'))?null:YRS.indexOf(+f);
+    M+=yi===null?sm(d.male):(d.male[yi]||0);
+    F+=yi===null?sm(d.female):(d.female[yi]||0);
+  });
+  const T=M+F,pM=(M/T*100).toFixed(1),pF=(F/T*100).toFixed(1);
+  document.getElementById('kTotal').textContent=T.toLocaleString('id');
+  document.getElementById('kMale').textContent=M.toLocaleString('id');
+  document.getElementById('kFemale').textContent=F.toLocaleString('id');
+  document.getElementById('kMaleTag').textContent=pM+'%';
+  document.getElementById('kFemaleTag').textContent=pF+'%';
+  document.getElementById('kRatio').textContent=(M/F).toFixed(2).replace('.',',');
+  document.getElementById('dMale').textContent=M.toLocaleString('id');
+  document.getElementById('dFemale').textContent=F.toLocaleString('id');
+  document.getElementById('bMale').style.width=pM+'%';
+  document.getElementById('bFemale').style.width=pF+'%';
+  document.getElementById('bMalePct').textContent=pM+'%';
+  document.getElementById('bFemalePct').textContent=pF+'%';
+  document.getElementById('donutCN').textContent=pM+'%';
+  buildDonut(M,F);
+}
+
+function rebuildAll(){
+  pIdx++;
+  buildTrend(trendMode);
+  buildBar();
+  buildGRT();
+  buildDist();
+  buildTopChange();
+  buildRTGrid();
+  buildProjChart();
+}
+
+setInterval(rebuildAll,10000);
+
+document.getElementById('filterRow').addEventListener('click',e=>{
+  const b=e.target.closest('.p');if(!b) return;
+  document.querySelectorAll('.p').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  buildKPI(b.dataset.f);
+});
+
+document.querySelectorAll('.tb').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tb').forEach(t=>t.classList.remove('on'));
+    tab.classList.add('on');
+    trendMode=tab.dataset.t;
+    buildTrend(trendMode);
+  });
+});
+
+const tickers=[
+  'Total 76.128 jiwa tercatat dari 35 RT selama 2021–2025',
+  'RT 5 adalah RT terbesar — total 3.690 jiwa dalam 5 tahun',
+  'RT 14 mencatat puncak 1.205 jiwa pada tahun 2024',
+  'RT 8 mencatat 1.200 jiwa pada tahun 2021 — tertinggi di awal periode',
+  'Analisis K-Means menemukan 7 kelompok pola populasi berbeda',
+  'Silhouette Score 0,295 · Davies-Bouldin Index 0,865 — validasi statistik cukup baik',
+  'RT 13 & RT 21 masuk Kelompok Penurunan Kritis — perlu perhatian segera',
+  'Rasio laki-laki vs perempuan: 1,04 — hampir seimbang',
+  '7 RT dalam Kelompok Tumbuh Stabil — kondisi paling ideal di kelurahan',
+  'Proyeksi 2026: Kelompok Pertumbuhan Sedang diperkirakan capai 4.063 jiwa',
+];
+let ti=0;
+function tick(){document.getElementById('ticker').textContent='[ '+tickers[ti++%tickers.length]+' ]';}
+tick();setInterval(tick,3500);
+
+// Init
+buildKPI('all');
+buildTrend('total');
+buildBar();buildGRT();buildDist();buildTopChange();buildRTGrid();buildClusterPills();buildProjChart();
+</script>
+</body>
+</html>
