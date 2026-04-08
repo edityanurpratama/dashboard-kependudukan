@@ -87,7 +87,7 @@ Klik dua kali file index.html
 
 **Atau akses online via GitHub Pages:**
 ```
-https://github.com/edityanurpratama/dashboard-kependudukan
+[https://github.com/edityanurpratama/dashboard-kependudukan](https://edityanurpratama.github.io/dashboard-kependudukan/)
 ```
 
 ---
